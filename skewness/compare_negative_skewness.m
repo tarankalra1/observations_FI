@@ -6,7 +6,7 @@ nt1=2000; nt2= 2028;
 % 
 %nt1=680 ; nt2=730 ; 
 
-load('skewness_steve.mat','Su_skewness','ur_maj_rot','vr_min_rot',........
+load('../../skewness_steve.mat','Su_skewness','ur_maj_rot','vr_min_rot',........
              'Hrmsu','Ubr','Ur','dn','jtb_rec')
  Su_skewness_old=0.0;     
  for t=nt1:nt2

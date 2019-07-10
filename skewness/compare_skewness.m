@@ -6,8 +6,9 @@ nt1=1; nt2= 2044;
 % 
 %nt1=680 ; nt2=730 ; 
 
-load('matfiles/skewness_steve.mat','Su_skewness','ur_maj_rot','vr_min_rot',........
-            'Hrmsu','Ubr','Ur','dn','jtb_rec','ur_cube','ang_rot','Au_skewness')
+load('/media/taran/DATADRIVE2/Obs_data/matfiles/skewness_steve.mat','Su_skewness','ur_maj_rot','vr_min_rot',........
+            'Hrmsu','omega_br','Ubr','Ursell','dn','jtb_rec','ur_bar','ur_cube','ang_rot','Au_skewness')
+
  Su_skewness_old=0.0;     
  for t=nt1:nt2
    Su_skewness_adv(t)=Su_skewness(t); %+Su_skewness_old; 

@@ -1,6 +1,5 @@
 function wfr=findwfr(wf)
 
-
 for i=1:length(wf)
 ubh(i)=wf(i).umax-wf(i).umin;
 end
@@ -17,6 +16,7 @@ tmax(i)=wf(i).tc_max/wf(i).Tc;
 tmin(i)=wf(i).tt_max/wf(i).Tt;
 end
 
+wfr.dn=wf(1).dn(1);
 wfr.ubh=ubhr;
 wfr.umax=mean(umaxr)*ubhr;
 wfr.umin=mean(uminr)*ubhr;

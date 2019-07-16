@@ -54,14 +54,15 @@ if sign(A(1))>=0
     wf(cnt).dn=dnst+[ts{i} ts{i+1}(2:end)]/(3600*24);
     wf(cnt).t=[ts{i}-ts{i}(1) ts{i+1}(2:end)-ts{i}(1)];
     wf(cnt).ub=[s{i} s{i+1}(2:end)]
+    wf(cnt).T=T(i)+T(i+1);
     wf(cnt).Tc=T(i);
     wf(cnt).Tt=T(i+1);
     wf(cnt).umax=S_max(i);
     wf(cnt).umin=S_min(i+1);
     wf(cnt).Ac=A(i);
     wf(cnt).At=A(i+1);
-    wf(cnt).tc_max=wf(cnt).t(wf(cnt).ub==wf(cnt).umax);
-    wf(cnt).tt_max=wf(cnt).t(wf(cnt).ub==wf(cnt).umin);
+    wf(cnt).Tcu=wf(cnt).t(wf(cnt).ub==wf(cnt).umax);
+    wf(cnt).Ttu=wf(cnt).t(wf(cnt).ub==wf(cnt).umin)-wf(cnt).Tc;
 %     plot(wf(cnt).t,wf(cnt).s)
 %     set(gca,'xlim',xlim)
 %     line(xlim, [0 0],'color',[0.5 0.5 0.5])
@@ -76,14 +77,15 @@ else
     wf(cnt).dn=dnst+[ts{i} ts{i+1}(2:end)]/(3600*24);
     wf(cnt).t=[ts{i}-ts{i}(1) ts{i+1}(2:end)-ts{i}(1)];
     wf(cnt).ub=[s{i} s{i+1}(2:end)]
+    wf(cnt).T=T(i)+T(i+1);
     wf(cnt).Tc=T(i);
     wf(cnt).Tt=T(i+1);
     wf(cnt).umax=S_max(i);
     wf(cnt).umin=S_min(i+1);
     wf(cnt).Ac=A(i);
     wf(cnt).At=A(i+1);
-    wf(cnt).tc_max=wf(cnt).t(wf(cnt).ub==wf(cnt).umax);
-    wf(cnt).tt_max=wf(cnt).t(wf(cnt).ub==wf(cnt).umin);
+    wf(cnt).Tcu=wf(cnt).t(wf(cnt).ub==wf(cnt).umax);
+    wf(cnt).Ttu=wf(cnt).t(wf(cnt).ub==wf(cnt).umin)-wf(cnt).Tc;
     
 %     plot(wf(cnt).t,wf(cnt).s)
 %     set(gca,'xlim',xlim)

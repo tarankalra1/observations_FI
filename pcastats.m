@@ -16,7 +16,7 @@ if(nargin <4),ipost=0;end
 if(nargin <3),ipost=0;s=0;end
 
 % tsk 
-ipost=0 ; 
+%ipost=0 ; 
 
 mu = mean(u);
 mv = mean(v);

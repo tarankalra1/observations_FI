@@ -9,11 +9,9 @@ kN2 = 30*0.4e-2
 % advbfn = '9885advb-cal.nc'; % burstfile name
 % advsfn = '9885advs-cal.nc'; % statistics filename
 
-advbfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9917advb-cal.nc'); % burstfile name
-advsfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9917advs-cal.nc'); % statistics filename
 
-%advbfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9885advb-cal.nc');
-%advsfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9885advs-cal.nc'); 
+advbfn = fullfile('C:\Users\ssuttles\data\FireIsland\analysis\Taran\9917advb-cal.nc'); % burstfile name
+advsfn = fullfile('C:\Users\ssuttles\data\FireIsland\analysis\Taran\9917advs-cal.nc'); % statistics filename
 
 ncload(advsfn); % load the statistics file
 
@@ -79,10 +77,10 @@ nominal_depth = ncreadatt(advbfn,'/','WATER_DEPTH') % nominal
 %[sd1 az1 sd2 az2]=pcastats(u_1205,v_1206,25,1)
 
 %% process bursts with no QA/QC
-%for n = 1:length(dn)
- nt1=680; nt2=730; 
-count=1; 
-for n=nt1:nt2
+for n = 1:length(dn)
+%  nt1=680; nt2=730; 
+% count=1; 
+% for n=nt1:nt2
    if(~isnan(depth(n)))
       bn = ncread(advbfn,'burst',n,1);      % this burst number from beginning...might just want to go from 1 to nb
       jtb = double(ncread(advbfn,'time',[1 n],[1 1]))+......
@@ -116,6 +114,17 @@ for n=nt1:nt2
      
      % get ubr, Hrms
      PUV(n) = puvq(p, (u), (v), depth(n), zp(n), zr(n), fs, 1050, 1030., 0.04, 1/6);
+     
+     if 1
+     figure(5); clf
+     plot(UBS(n).ur,UBS(n).vr,'.')
+     title(sprintf('Rotated Burst Velocities burst = %d , %s',bn,dnsb))
+     xlabel('ur, [m ^. s^{-1}]')
+     ylabel('vr, [m ^. s^{-1}]')
+     set(gca,'xlim',[-0.5 0.5]);
+     set(gca,'ylim',[-0.5 0.5])
+     pause(0.1)
+     end
      
      kh = qkhfs( 2*pi/PUV(n).Tr, depth(n) );
      Tr(n)=PUV(n).Tr; 
@@ -174,6 +183,8 @@ Su = rp.Su;
 Au = rp.Au;
 r = rp.r;
 sk = UBS.ur_sk;
+
+save mat\puv_proc_FI
 % 
 % figure(5); clf
 % subplot(411)

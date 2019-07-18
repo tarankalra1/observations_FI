@@ -51,11 +51,11 @@ surface_wave=1;
 % 
 %t_end=2000 ;
  for i=nt1:nt2
-   [bedldx(i), bedldy(i), Ur(i), R(i), Beta(i)]=vandera_function_obs(i, Hs(i), Td(i), h(i), d50, d90, .....
+   [bedldx(i), bedldy(i), Ur(i), R(i), Beta(i)]=vandera_function_workhorse(i, Hs(i), Td(i), h(i), d50, d90, .....
                                                   umag_curr, phi_curwave, uhat(i), .....
                                                   Zref, delta, waveavgd_stress_term, surface_wave);
  end 
- save('vandera_bedld.mat','bedldx','R','Beta','Ur')
+ save('vandera_bedld_workhorse.mat','bedldx','R','Beta','Ur')
 %  figure(1)
 % plot(uhat(1:t_end),bedldx(1:t_end),'*--')
 % xlabel('uhat')

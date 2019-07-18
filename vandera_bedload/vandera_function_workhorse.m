@@ -644,7 +644,6 @@ dtr = pi/180.;
 %
 % k is the local wave number computed with linear wave theory.
 %
-T
 k=kh_calc(T,depth)/depth  
 %
 % H_s=sqrt(2.0)*H_rms

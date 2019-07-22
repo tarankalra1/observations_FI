@@ -56,16 +56,14 @@ nominal_depth = ncreadatt(advbfn,'/','WATER_DEPTH') % nominal
  
 %% process bursts with no QA/QC
 %for = 1:length(dn)
-nt1=1; nt2=2087; 
-%count=1; 
-%nt2=nt1 ; 
-%nt1=1;  nt2=2087; 
-isave=1; 
+nt1=1; nt2=2044; 
+
+isave=0; 
 
 % set the time period in seconds for excluding infragravity wave band
 t_up=20; t_low=4 ;
 
-for n=nt1:nt2  
+for n=nt1:nt2 
    if(~isnan(depth(n)))
       bn = ncread(advbfn,'burst',n,1);      % this burst number from beginning...might just want to go from 1 to nb
       jtb = double(ncread(advbfn,'time',[1 n],[1 1]))+......
@@ -104,6 +102,7 @@ for n=nt1:nt2
       UBS(n) = ubstatsr( u_send, v_send, fs );
       ur_maj_rot=UBS(n).ur; % major rotated
       vr_min_rot=UBS(n).vr; % minor 
+      CRS_skew(n)=UBS(n).ur_sk; 
       ang_rot(n)=UBS(n).maj_az; 
       % 
 %      FIND SKEWNESS 
@@ -155,7 +154,10 @@ end
 % ylim([-50.0 50.0])
 
 figure(1)
-plot(ur_cube)
+plot(Su_skewness)
+hold on
+plot(CRS_skew)
+
 %hold on 
 %plot(u_med)
 

@@ -15,19 +15,20 @@ h(:)=squeeze(hght_18(1,1,:)); % extract depth;
      if (Td(i)>30);
          Td(i)=0.0;
      end
-     [uhat(i),Tbav(i)]=ubspecfun(Hs(i),Td(i),h(i) );
+     [uhat_emp(i),Tbav(i)]=ubspecfun(Hs(i),Td(i),h(i) );
+     
+     [r(i), phi(i), Ur_emp(i)]=skewness_params(Hs(i),Td(i),h(i));
+     
+     [Tc_emp(i), Tt_emp(i), Tcu_emp(i), Ttu_emp(i), umax_emp(i), umin_emp(i), RR_emp(i),....
+         beta_emp(i)]=abreu_points(r(i), phi(i), uhat_emp(i), Td(i));
  end
 % 
+%Uw_emp=uhat; 
 
-[r, phi, Ur_emp] = skewness_params(Hs, Td, h);
-
-[Tc_emp, Tt_emp, Tcu_emp, Ttu_emp, umax_emp, umin_emp, RR_emp,....
-         beta_emp]=abreu_points(r, phi, uhat, Td );
-
-Uw_emp=uhat; 
-
-save('/media/taran/DATADRIVE2/Obs_data/matfiles/workhorse_emp_waveform.mat','Ur_emp','umax_emp','umin_emp','Tc_emp','Tt_emp',........
-     'Tcu_emp','Ttu_emp','RR_emp','beta_emp','Uw_emp'); 
+save('/media/taran/DATADRIVE2/Obs_data/matfiles/workhorse_emp_waveform.mat',.....
+     'Ur_emp','Hs','Td','h',.......
+     'umax_emp','umin_emp','Tc_emp','Tt_emp',........
+     'Tcu_emp','Ttu_emp','RR_emp','beta_emp','uhat_emp'); 
 
 %
 function [r, phi, Ur] = skewness_params(H_s, T, depth);
@@ -53,7 +54,7 @@ dtr = pi/180.;
 %
 % k is the local wave number computed with linear wave theory.
 %
-k=kh_calc(T,depth)/depth
+k=kh_calc(T,depth)./depth     ; 
 %
 % H_s=sqrt(2.0)*H_rms
 a_w=0.5*H_s ;
@@ -211,7 +212,8 @@ return
 end % function abreu_points
 
 %% kh_calc
-function kh = kh_calc(Td,depth);
+function kh=kh_calc(Td,depth);
+ 
 %
 %  Calculate wave number from Wave period and depth
 %
@@ -219,7 +221,7 @@ function kh = kh_calc(Td,depth);
 % HR Wallingford Report TR 155, February 2006
 %
 g = 9.81;
-omega=2.0*pi/Td;
+omega=2.0*pi./Td;
 x=omega^2.0*depth/g;
 %
 if(x<1.0);

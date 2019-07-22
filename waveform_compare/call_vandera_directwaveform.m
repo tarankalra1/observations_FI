@@ -1,32 +1,13 @@
 clear all ; close all ; clc; 
-% This is based on the prototype code intended for ROMS, as of
-% April 15, 2019
-% code to call vandera bedload routines for a time-series 
-% based on workhorse and ADV data
-% Code written by Tarandeep S. Kalra and Chris Sherwood
 
-
-% LOAD the observational data from workhorse from Fire Island 
-url='/media/taran/DATADRIVE2/Obs_data/data_netcdf/9921whp-cal.nc'
-netcdf_load(url)
-Hs(:)=squeeze(wh_4061(1,1,:));
-Td(:)=squeeze(wp_peak(1,1,:));
-h(:)=squeeze(hght_18(1,1,:)); % extract depth; 
-
- % h=depth; % Depth from ADV  
-% %ntime=end 
- for i=1:length(Hs)
-     if (Hs(i)>100);
-        Hs(i)=0.0;
-     end
-     if (Td(i)>30); 
-         Td(i)=0.0;
-     end 
-     [uhat(i),Tbav(i)]=ubspecfun(Hs(i),Td(i),h(i) ); 
- end
-% 
+load('/media/taran/DATADRIVE2/Obs_data/matfiles/workhorse_emp_waveform.mat',.....
+     'Ur_emp','Hs','Td','h',.......
+     'umax_emp','umin_emp','Tc_emp','Tt_emp',........
+     'Tcu_emp','Ttu_emp','RR_emp','beta_emp','uhat_emp'); % 
 % Read in Steve's waveform to get umax, umin, T_c, T_t....
 %
+load('/media/taran/DATADRIVE2/Obs_data/matfiles/skewness_orbital_array.mat','dn') 
+
 load('/media/taran/DATADRIVE2/Obs_data/matfiles/9917adv_wfr.mat')
 
 umax=[wfr.umax] ; 
@@ -39,8 +20,110 @@ T=[wfr.T] ;
 R=[wfr.R] ;
 uhat=[wfr.Uw] ;
 %  
+nt1=1; nt2=2044;
+
  for i=nt1:nt2
-      if(~isnan(uhat(i)))  
+      if(~isnan(h(i)))
+        Hs_emp(i)=Hs(i); 
+        T_emp(i)=Td(i); 
+        h_emp(i)=h(i); 
       end
  end
+ figure(1)
+ plot(dn(nt1:nt2),T_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),T,'r')
+title('Time period')
+ legend('workhorse','waveform from ADV')
+xlim([dn(nt1) dn(nt2)]);
+datetick('x',2) % 
+print -dpng '../pngfiles/workhorse_waveform_ADV_Timeperiod.png'
+
+figure(2)
+ plot(dn(nt1:nt2),Tc_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),T_c,'r')
+ title('Tcrest')
+ legend('empirical from workhorse','waveform from ADV')
+xlim([dn(nt1) dn(nt2)]);
+datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_T_crest.png'
  
+ figure(3)
+ plot(dn(nt1:nt2),uhat_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),uhat,'r')
+ title('uhat')
+ legend('empirical from workhorse','waveform from ADV')
+ xlim([dn(nt1) dn(nt2)]);
+ datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_uhat.png'
+
+ 
+ figure(4)
+ plot(dn(nt1:nt2),umax_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),umax,'r')
+ title('umax/ucrest')
+ legend('empirical from workhorse','waveform from ADV')
+ xlim([dn(nt1) dn(nt2)]);
+ datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_umax.png'
+ 
+ 
+ figure(5)
+ plot(dn(nt1:nt2),umin_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),umin,'r')
+ title('umin/utrough')
+ legend('empirical from workhorse','waveform from ADV','Location','Southeast')
+ %xlim([dn(nt1) dn(nt2)]);
+ %datetick('x',2) % 
+ xlim([dn(nt1) dn(nt2)]);
+datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_umin.png'
+ 
+ 
+ figure(6)
+ plot(dn(nt1:nt2),RR_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),R,'r')
+ title('R')
+ legend('empirical from workhorse','waveform from ADV','Location','Southeast')
+ %xlim([dn(nt1) dn(nt2)]);
+ %datetick('x',2) % 
+ xlim([dn(nt1) dn(nt2)]);
+datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_R.png'
+ 
+ 
+figure(7)
+ plot(dn(nt1:nt2),Tt_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),T_t,'r')
+ title('T-trough')
+ legend('empirical from workhorse','waveform from ADV')
+xlim([dn(nt1) dn(nt2)]);
+datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_T_trough.png'
+ 
+ 
+figure(8)
+ plot(dn(nt1:nt2),Tcu_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),T_cu,'r')
+ title('T-cu')
+ legend('empirical from workhorse','waveform from ADV')
+xlim([dn(nt1) dn(nt2)]);
+datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_T_cu.png'
+ 
+figure(9)
+ plot(dn(nt1:nt2),Ttu_emp(nt1:nt2),'k--')
+ hold on
+ plot(dn(nt1:nt2),T_tu,'r')
+ title('T-tu')
+ legend('empirical from workhorse','waveform from ADV')
+xlim([dn(nt1) dn(nt2)]);
+datetick('x',2) % 
+ print -dpng '../pngfiles/workhorse_waveform_ADV_T_tu.png'

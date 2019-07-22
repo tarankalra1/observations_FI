@@ -35,7 +35,7 @@ burst_time=8400 ;
 %dn=j2dn(time,time2);
 % theta_cr =0.   ; % WRONG ASSUMPTION 
  for t=1:nt2
-   [qb_measured(t)]=calc_mpm (ur_maj_rot_array(:,t),omega_br(t),......
+   [qb_measured(t)]=func_calc_mpm (ur_maj_rot_array(:,t),omega_br(t),......
                         Ubr(t),d50,burst_time,osmgd,theta_cr,.......
                         gamma,smgd3) ; 
  end
@@ -52,33 +52,4 @@ dt=3600 ;
 
 bedload_measured=cumtrapz(qb_measured) 
 
-% % % % integrate in time 
- load('../../matfiles/vandera_bedld.mat','bedldx','R','Beta','Ur')
-subplot(2,1,2)
- bedload_vand=cumtrapz(bedldx);
- plot(dn(nt1:nt2),bedload_vand(nt1:nt2)*dt) 
- title('Cumulative calculated with vandera')
- xlim([dn(nt1) dn(nt2)]);
- datetick('x',2) % 
- print -dpng '../pngfiles/cumulative_bedload_vand_mpm_withsign.png'
-
-%   
- figure(2)
-%subplot(2,1,1)
-plot(dn(nt1:nt2),bedload_measured(nt1:nt2)*dt)
-% title('Cumulative measured bedload with MPM')
- xlim([dn(nt1) dn(nt2)]);
- datetick('x',2) % 
-% % 
-% % % % integrate in time 
-% load('../../matfiles/vandera_bedld.mat','bedldx','R','Beta','Ur')
-% hold on
-% bedload_vand=cumtrapz(bedldx) ;
-%  plot(dn(nt1:nt2),bedload_vand(nt1:nt2)*dt) 
-% % title('Cumulative calculated with vandera')
-%  xlim([dn(nt1) dn(nt2)]);
-%  datetick('x',2) % 
-%  legend('measured-MPM','vandera','location','NorthWest')
-%  print -dpng '../pngfiles/cumulative_bedload_vand_mpm_withsign_3600.png'
-% 
-%  
+save('../../matfiles/mpm_only_ss.mat','Su_skewness','qb_measured','bedload_measured')

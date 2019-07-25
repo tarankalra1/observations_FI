@@ -5,28 +5,25 @@ netcdf_load(url)
 Hs(:)=squeeze(wh_4061(1,1,:));
 Td(:)=squeeze(wp_peak(1,1,:));
 h(:)=squeeze(hght_18(1,1,:)); % extract depth; 
-
+nt1=1; nt2=2044; 
  % h=depth; % Depth from ADV  
 % %ntime=end 
- for i=1:length(Hs)
-     if (Hs(i)>100);
-        Hs(i)=0.0;
-     end
-     if (Td(i)>30);
-         Td(i)=0.0;
-     end
+% for i=1:length(Hs)
+for i=nt1:nt2
      [uhat_emp(i),Tbav(i)]=ubspecfun(Hs(i),Td(i),h(i) );
      
-     [r(i), phi(i), Ur_emp(i)]=skewness_params(Hs(i),Td(i),h(i));
+     % Used the representate time period 
+     [r(i), phi(i), Ur_emp(i)]=skewness_params(Hs(i),Tbav(i),h(i));
      
      [Tc_emp(i), Tt_emp(i), Tcu_emp(i), Ttu_emp(i), umax_emp(i), umin_emp(i), RR_emp(i),....
-         beta_emp(i)]=abreu_points(r(i), phi(i), uhat_emp(i), Td(i));
+         beta_emp(i)]=abreu_points(r(i), phi(i), uhat_emp(i), Tbav(i));
+ %  end 
  end
 % 
 %Uw_emp=uhat; 
 
-save('/media/taran/DATADRIVE2/Obs_data/matfiles/workhorse_emp_waveform.mat',.....
-     'Ur_emp','Hs','Td','h',.......
+save('/media/taran/DATADRIVE2/Obs_data/matfiles/workhorse_emp_waveform_ubspecfun.mat',.....
+     'Ur_emp','Hs','Tbav','h',.......
      'umax_emp','umin_emp','Tc_emp','Tt_emp',........
      'Tcu_emp','Ttu_emp','RR_emp','beta_emp','uhat_emp'); 
 

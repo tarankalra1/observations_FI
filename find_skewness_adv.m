@@ -9,8 +9,11 @@ kN2 = 30*0.4e-2   ;
 % advbfn = '9885advb-cal.nc'; % burstfile name
 % advsfn = '9885advs-cal.nc'; % statistics filename
 
-advbfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9917advb-cal.nc'); % burstfile name
-advsfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9917advs-cal.nc'); % statistics filename
+% advbfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9917advb-cal.nc'); % burstfile name
+% advsfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9917advs-cal.nc'); % statistics filename
+
+advbfn = fullfile('C:\Users\ssuttles\data\FireIsland\analysis\Taran\9917advb-cal.nc'); % burstfile name
+advsfn = fullfile('C:\Users\ssuttles\data\FireIsland\analysis\Taran\9917advs-cal.nc'); % statistics filename
 
 %advbfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9885advb-cal.nc');
 %advsfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9885advs-cal.nc'); 
@@ -49,14 +52,14 @@ p_z = ncreadatt(advbfn,'P_4022','initial_sensor_height');
 pdelz = p_z-z_init; % elevation diff. between velocity and pressure
 zp = zr+pdelz; % elevation of pressure measurements [m] accounting for variable brange
 depth = zr+pdelz+(P_4023(gb)*0.01-ap); % time series of depth [decibars ~= meters]
-
+depth(depth>1e30)=NaN; %convert fill_values to NaNs
 fs = ncreadatt(advbfn,'/','ADVDeploymentSetupSampleRate')
 nsamp = ncreadatt(advbfn,'/','ADVDeploymentSetupSamplesPerBurst')
 nominal_depth = ncreadatt(advbfn,'/','WATER_DEPTH') % nominal
  
 %% process bursts with no QA/QC
 %for = 1:length(dn)
-nt1=1; nt2=2087; 
+nt1=140; nt2=180; 
 %count=1; 
 %nt2=nt1 ; 
 %nt1=1;  nt2=2087; 
@@ -95,10 +98,11 @@ for n=nt1:nt2
       u_med=medfilt(u_band, 9) ; %smooth
       v_med=medfilt(v_band, 9) ;
       
-      u_send=u_med;
-      v_send=v_med; 
+      u_send=u_band;
+      v_send=v_band; 
         
 %       % PCA STATS ;
+        figure(1); clf
       [sd1 az1 sd2 az2]=pcastats(u_send*100,v_send*100,50,1);
 
       UBS(n) = ubstatsr( u_send, v_send, fs );
@@ -139,6 +143,57 @@ for n=nt1:nt2
         save('skewness_orbital_array.mat','Su_skewness','ur_maj_rot_array','vr_min_rot_array',........
            'Hrmsu','Ubr','Ursell','dn','jtb_rec') 
        end 
+       
+        elseif isnan(depth(n)) & exist('PUV')
+            jtb = double(ncread(advbfn,'time',[1 n],[1 1]))+......
+            double(ncread(advbfn,'time2',[1 n],[1 1])/(3600*24*1000));
+    
+        %set struct variblles to NaNs
+            puvfnames=fieldnames(PUV);
+                for i=1:length(puvfnames)
+                PUV(n).(puvfnames{i})=nan(size(PUV(n-1).(puvfnames{i})));
+                end 
+           
+            ubsfnames=fieldnames(UBS);
+                for i=1:length(ubsfnames)
+                UBS(n).(ubsfnames{i})=nan(size(UBS(n-1).(ubsfnames{i})));
+                end
+    
+                %other index vars to NaN
+                 Tr(n)=NaN; 
+                 Ubr(n)=NaN; 
+                 Hrmsu(n)=NaN; 
+                 k(n) = NaN;
+                 Ur(n) = NaN; 
+
+                velu_skew(n)=NaN;
+                velv_skew(n)=NaN;
+
+                ang_rot(n)=NaN;
+                 ur_maj_rot=UBS(n).ur; % major rotated
+                 vr_min_rot=UBS(n).vr; % minor 
+      
+                Su_skewness(n)=NaN;    
+                Au_skewness(n)=NaN; 
+      
+               ur_bar(n)=mean(ur_maj_rot); 
+               ur_cube(n)=mean(ur_maj_rot.^3);  
+                omega_br(n)=NaN ;  
+                Ursell(n) = NaN;
+     
+                jtb_rec(n)=jtb ;
+              
+           if(isave==1)
+             save('skewness_steve.mat','Su_skewness','ur_maj_rot','vr_min_rot',........
+                'Hrmsu','Tr','omega_br','Ubr','depth','Ursell','dn','jtb_rec','ur_bar','ur_cube','ang_rot','Au_skewness')
+           end
+           if(isave==2)
+
+            ur_maj_rot_array(:,n)=ur_maj_rot; 
+            vr_min_rot_array(:,n)=vr_min_rot; 
+            save('skewness_orbital_array.mat','Su_skewness','ur_maj_rot_array','vr_min_rot_array',........
+               'Hrmsu','Ubr','Ursell','dn','jtb_rec') 
+           end 
    end
 end
 %(nt1:nt2),Su_skewness_adv(nt1:nt2),'linewidth',2);

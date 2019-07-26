@@ -9,9 +9,11 @@ kN2 = 30*0.4e-2
 % advbfn = '9885advb-cal.nc'; % burstfile name
 % advsfn = '9885advs-cal.nc'; % statistics filename
 
-
 advbfn = fullfile('C:\Users\ssuttles\data\FireIsland\analysis\Taran\9917advb-cal.nc'); % burstfile name
 advsfn = fullfile('C:\Users\ssuttles\data\FireIsland\analysis\Taran\9917advs-cal.nc'); % statistics filename
+
+%advbfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9885advb-cal.nc');
+%advsfn = fullfile('/media/taran/DATADRIVE2/Obs_data/data_netcdf/9885advs-cal.nc'); 
 
 ncload(advsfn); % load the statistics file
 
@@ -47,7 +49,7 @@ p_z = ncreadatt(advbfn,'P_4022','initial_sensor_height');
 pdelz = p_z-z_init; % elevation diff. between velocity and pressure
 zp = zr+pdelz; % elevation of pressure measurements [m] accounting for variable brange
 depth = zr+pdelz+(P_4023(gb)*0.01-ap); % time series of depth [decibars ~= meters]
-
+depth(depth>1e30)=NaN; %convert fill_values to NaNs
 fs = ncreadatt(advbfn,'/','ADVDeploymentSetupSampleRate')
 nsamp = ncreadatt(advbfn,'/','ADVDeploymentSetupSamplesPerBurst')
 nominal_depth = ncreadatt(advbfn,'/','WATER_DEPTH') % nominal
@@ -77,14 +79,14 @@ nominal_depth = ncreadatt(advbfn,'/','WATER_DEPTH') % nominal
 %[sd1 az1 sd2 az2]=pcastats(u_1205,v_1206,25,1)
 
 %% process bursts with no QA/QC
+%n=100
 for n = 1:length(dn)
 %  nt1=680; nt2=730; 
 % count=1; 
 % for n=nt1:nt2
    if(~isnan(depth(n)))
       bn = ncread(advbfn,'burst',n,1);      % this burst number from beginning...might just want to go from 1 to nb
-      jtb = double(ncread(advbfn,'time',[1 n],[1 1]))+......
-            double(ncread(advbfn,'time2',[1 n],[1 1])/(3600*24*1000)); 
+      jtb = double(ncread(advbfn,'time',[1 n],[1 1]))+double(ncread(advbfn,'time2',[1 n],[1 1]))/(3600*24*1000); 
       dnsb = datestr(datenum(gregorian(jtb))); 
       fprintf(1,'Burst %d at %s\n',bn,dnsb);
       u = ncread(advbfn,'u_1205',[1 n],[Inf 1])/100;
@@ -103,6 +105,11 @@ for n = 1:length(dn)
       % TODO - QA/QC, replace sketchy values here
       
       % TODO - Do we want to do any filtering here?
+      T_long= 20; %longest wave period in bandpass filter (s)
+      T_short = 4; %shortest wave period in bandpass filter (s)
+      p=iwavesbp(p,fs,T_long,T_short);
+      u=iwavesbp(u,fs,T_long,T_short);
+      v=iwavesbp(v,fs,T_long,T_short);
       
       % quick look at raw data
  
@@ -125,6 +132,7 @@ for n = 1:length(dn)
      set(gca,'ylim',[-0.5 0.5])
      pause(0.1)
      end
+     
      
      kh = qkhfs( 2*pi/PUV(n).Tr, depth(n) );
      Tr(n)=PUV(n).Tr; 
@@ -157,18 +165,41 @@ for n = 1:length(dn)
      hp = nanmedian(zp);
      hv = -pdelz;
      nF = 1050;
-     
-   %  u=detrend(u); v=detrend(v); p=detrend(p);
-     
-  %   u=iwavesbp(u,0.04) ; %0.04 Hz 
-     [Su,Sp,Dir,Spread,F,dF,DOF] = wds(u,v,p,1/fs,nF,hp,hv,parms);
-     
-     
+     [Su,Sp,Dir,Spread,F,dF,DOF] = wds(detrend(u),detrend(v),detrend(p),1/fs,nF,hp,hv,parms);
      [Hs(n),peakF(n),peakDir(n),peakSpread(n)] = hs(Su,Sp,Dir,Spread,F,dF);
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %save('nortek.mat','Hs', 
-      
-   end
+   
+   elseif isnan(depth(n)) & exist('PUV')
+    
+    %set struct variblles to NaNs
+       puvfnames=fieldnames(PUV)
+    for i=1:length(puvfnames)
+        PUV(n).(puvfnames{i})=nan(size(PUV(1).(puvfnames{i})));
+    end 
+           
+       ubsfnames=fieldnames(UBS)
+    for i=1:length(ubsfnames)
+        UBS(n).(ubsfnames{i})=nan(size(UBS(1).(ubsfnames{i})));
+    end
+    
+    %other index vars to NaN
+     Tr(n)=NaN; 
+     Ubr(n)=NaN; 
+     Hrmsu(n)=NaN; 
+     k(n) = NaN;
+     Ur(n) = NaN; 
+     
+     velu_skew(n)=NaN;
+     velv_skew(n)=NaN;
+     
+     Hs(n)=NaN;
+     peakF(n)=NaN;
+     peakDir(n)=NaN;
+     peakSpread(n)=NaN;
+  end 
+       
+
 end
 %% The directions from PUV need to be flipped 180, I think.
 azr = 180+[PUV(:).azr];
@@ -184,7 +215,7 @@ Au = rp.Au;
 r = rp.r;
 sk = UBS.ur_sk;
 
-save mat\puv_proc_FI
+save mat\puv_proc_FI_iwaves
 % 
 % figure(5); clf
 % subplot(411)

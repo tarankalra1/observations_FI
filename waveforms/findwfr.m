@@ -8,7 +8,7 @@ function wfr=findwfr(wf)
 % T=mean(T);
 
 for i=1:length(wf)
-Uw(i)=wf(i).umax-wf(i).umin;
+Uw(i)=(wf(i).umax-wf(i).umin)/2;
 T(i)=wf(i).T;
 Tr(i)=wf(i).T/T(i);    
 Tcr(i)=wf(i).Tc/T(i);

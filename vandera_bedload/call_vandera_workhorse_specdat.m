@@ -1,5 +1,6 @@
 clear all ; close all ; clc; 
-% Use the workhorse data with UBSPECFUN code that is using JONSWAP spectrum
+% Use the workhorse data along with ubspecdat code with vspec
+% to giev teh vandera bedload 
 % Code written by Tarandeep S. Kalra and Chris Sherwood
 
 % Enter sediment information in meters
@@ -24,36 +25,27 @@ nt1=1; nt2= 2044;
 url='/media/taran/DATADRIVE2/Obs_data/data_netcdf/9921whp-cal.nc'
 netcdf_load(url)
 Hs(:)=squeeze(wh_4061(1,1,:));
-Td(:)=squeeze(wp_peak(1,1,:));
+%Td(:)=squeeze(wp_peak(1,1,:));
 h(:)=squeeze(hght_18(1,1,:)); % extract depth; 
 
- % h=depth; % Depth from ADV  
-% %ntime=end 
- for i=1:length(Hs)
-     if (Hs(i)>100);
-        Hs(i)=0.0;
-     end
-     if (Td(i)>30); 
-         Td(i)=0.0;
-     end 
-     [uhat(i),Tbav(i)]=ubspecfun(Hs(i),Td(i),h(i) ); 
- end
-% 
+% load vspec data of uhat and Tr 
+load('/media/taran/DATADRIVE2/Obs_data/matfiles/vspec_uhat_tr.mat','uhat_wh','Tr_wh')
 
 % Question- Would need to use peak wave period and not bottom wave period
 waveavgd_stress_term=1; 
 surface_wave=1;  
-current_timeperiod==0 ; 
+
 % NOTE THAT I AM USING TBOT AND NOT PEAK WAVE PERIOD 
 % 
 %t_end=2000 ;
  for i=nt1:nt2
-   [bedldx(i), bedldy(i), Ur(i), R(i), Beta(i)]=vandera_function_workhorse(i, Hs(i), Td(i), h(i), d50, d90, .....
-                                                  umag_curr, phi_curwave, uhat(i), .....
+   [bedldx_wh_vspec(i), bedldy(i), Ur(i), R(i), Beta(i)]=vandera_function_workhorse(i, Hs(i), Tr_wh(i), h(i), d50, d90, .....
+                                                  umag_curr, phi_curwave, uhat_wh(i), .....
                                                   Zref, delta, waveavgd_stress_term, surface_wave);
  end 
- save('vandera_bedld_workhorse_ubspecfun.mat','bedldx','R','Beta','Ur')
-%  figure(1)
+ save('/media/taran/DATADRIVE2/Obs_data/matfiles/vandera_bedld_workhorse_ubspecdat.mat','bedldx_wh_vspec','R','Beta','Ur')
+ %plot(bedldx_wh_vspec)
+ %  figure(1)
 % plot(uhat(1:t_end),bedldx(1:t_end),'*--')
 % xlabel('uhat')
 % ylabel('bedld in x')

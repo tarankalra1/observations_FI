@@ -1,10 +1,11 @@
 % Function that takes ucrest, utrough, Tcrest, Trough, Tcu, Ttu
 % Written by T.S. Kalra, July 19, 2019
 
-function [bedld_x, bedld_y, Ur, RR, beta]=vandera_function_directwaveform(time, Hs, Td, depth, d50, d90, .....
+function [bedld_x, bedld_y, bedld_tx, Ur, RR, beta]=vandera_function_directwaveform(time, Hs, Td, depth, d50, d90, .....
                                                  umag_curr, phi_curwave, uhat, umax, umin, .....
-						 T_c, T_t, T_cu, T_tu, ............
-                                                 Zref, delta, waveavgd_stress_term, surface_wave);					                      
+						                                T_c, T_t, T_cu, T_tu, ............
+                                                 Zref, delta, waveavgd_stress_term, ......
+                                                 current_timeperiod, surface_wave);					                      
 %Summary of this function goes here
 %   Detailed explanation goes here
 eps_eff=1.0; 
@@ -27,8 +28,8 @@ c_w=2*pi/(k*Td) ;              % Wave speed
 %
 % VA-2013 equation 1 is solved in 3 sub-steps
 %-----------------------------------------------------------------------
-umax=umax*Uhat; % Uw is the wave orbital velocity  
-umin=umin*Uhat; 
+umax=umax*uhat; % Uw is the wave orbital velocity  
+umin=umin*uhat; 
 
 uhat_c=umax; 
 uhat_t=umin; 
@@ -103,19 +104,19 @@ cff1=0.5*T_c/(T_cu);
 cff2=sqrt(mag_theta_c)*(om_cc+cff1*om_tc);;
 %
 cff3=theta_cx/mag_theta_c;
-bedld_cx=cff2*cff3;
+bedld_cx=cff2*cff3 ;
 %
 cff3=theta_cy/mag_theta_c;
-bedld_cy=cff2*cff3;
+bedld_cy=cff2*cff3 ;
 % 
 cff1=0.5*T_t/(T_tu);
 cff2=sqrt(mag_theta_t)*(om_tt+cff1*om_ct);
-
+ 
 cff3=theta_tx/mag_theta_t;
-bedld_tx=cff2*cff3;
+bedld_tx=cff2*cff3 ;
 %
 cff3=theta_ty/mag_theta_t;
-bedld_ty=cff2*cff3;
+bedld_ty=cff2*cff3 ;
 %
 % The units of these are m2 sec-1
 % bed_frac, rhos multiplied
@@ -164,23 +165,23 @@ end
 %  0.36*w_s is from Shant and Dong
 % 
 if(wavecycle==-1.0);
-    w_sc_eta=max(w_s-ws_eta,0.0);
-    w_sc_dsf=max(w_s-ws_dsf,0.0);
+    w_sc_eta=max(w_s-ws_eta,0.0) ;
+    w_sc_dsf=max(w_s-ws_dsf,0.0) ; 
 end
 %
 % VA2013 Equation 33, Phase lag parameter
 %cff=(1.0-wavecycle*xi*uhat_i)/c_w;
 % 
 cff=(1.0-((wavecycle*xi*uhat_i)/(c_w)));
-% 
-cff1_eta=(1.0/(2.0*(T_i-T_iu)*w_sc_eta));
-cff1_dsf=(1.0/(2.0*(T_i-T_iu)*w_sc_dsf)); 
+%   
+cff1_eta=(1.0/(2.0*(T_i-T_iu)*w_sc_eta))  ;
+cff1_dsf=(1.0/(2.0*(T_i-T_iu)*w_sc_dsf))  ; 
 %
 % For ripple regime 
 % CRS like this:
-P=alpha*dsf*cff*cff1_dsf;
+P=alpha*dsf*cff*cff1_dsf ; 
 if(eta>d50)
-    P=alpha*eta*cff*cff1_eta;
+    P=alpha*eta*cff*cff1_eta ;
 end
 
 % TODO CRS - this is not the same eps_eff that I put into the main routine
@@ -194,9 +195,15 @@ theta_cr=theta_cr_calc(d50, rhos);
 %
 % Sand load entrained in the flow during each half-cycle
 % 
-theta_diff=max((theta_ieff-theta_cr),0.0) ;;
+%theta_ieff 
+%theta_diff=max((theta_ieff-theta_cr),0.0) ;
+% NEW CHANGE TSK
+theta_diff=max((abs(theta_ieff)-theta_cr),0.0);
+
 om_i=m*(theta_diff)^n  ;
-         
+
+% NEW CHANGE TSK 
+om_i=om_i*sign(theta_ieff);           
 %
 % VA2013 Equation 23-26, Sandload entrained during half cycle
 %  
@@ -204,9 +211,9 @@ if(P<=1.0)
     om_ii=om_i;
     om_iy=0.0 ;
 else;
-    om_ii=om_i/P;
+    om_ii=om_i/P; 
     cff=1.0/P;
-    om_iy=om_i*(1.0-cff);
+    om_iy=om_i*(1.0-cff) ;
 end
  
 %if(wavecycle==1)
@@ -338,8 +345,9 @@ end
 %
 % Calculate the time period based on udelta     
 % 
-[T_c, T_t]=current_timeperiod(udelta, phi_curwave, umax, umin, RR, T_c, T_t, Td);
-%
+if(current_timeperiod==1)
+  [T_c, T_t]=current_timeperiod(udelta, phi_curwave, umax, umin, RR, T_c, T_t, Td);
+end 
 % Calculate the effect of surface waves 
 %
 if(surface_wave==1)

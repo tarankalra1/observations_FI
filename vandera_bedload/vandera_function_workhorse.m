@@ -355,10 +355,12 @@ end
 % Compute the change in time period based on converged udelta (current velocity at 
 % wave boundary layer)
 %
+%
 % Calculate the time period based on udelta     
 % 
-[T_c, T_t]=current_timeperiod(udelta, phi_curwave, umax, umin, RR, T_c, T_t, Td);
-%
+if(current_timeperiod==1)
+  [T_c, T_t]=current_timeperiod(udelta, phi_curwave, umax, umin, RR, T_c, T_t, Td);
+end 
 % Calculate the effect of surface waves 
 %
 if(surface_wave==1)
@@ -769,6 +771,9 @@ elseif(r>0.5 && r<1.0)
     cff2=cff1+1.0;
     betar_0=cff1/cff2;
 end
+    betar_0=0.5 ; 
+
+disp('Warning that beta is hardwired to be 0.5')
 %
 % MD, Equation 18
 %

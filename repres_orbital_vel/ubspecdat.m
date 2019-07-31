@@ -51,3 +51,5 @@ fr = (sum((Su.*fm.*df)')') ./ (sum((Su.*df)')')  ;%Eq. 9
 Tbr = 1./fr;
 fz = sqrt((sum((Su.*fm.^2.*df)')') ./ (sum((Su.*df)')'));
 Tbz = 1./fz;
+
+Hs=4.0*sum(s,2)*df

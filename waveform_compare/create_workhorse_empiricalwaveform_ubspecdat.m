@@ -9,8 +9,12 @@ Hs(:)=squeeze(wh_4061(1,1,:));
 %Td(:)=squeeze(wp_peak(1,1,:));
  h(:)=squeeze(hght_18(1,1,:)); % extract depth; 
 nt1=1; nt2=2044; 
+initial_sensor_height = 2.11; 
 
-load('/media/taran/DATADRIVE2/Obs_data/matfiles/vspec_uhat_tr.mat','uhat_wh','Tr_wh')
+% Add the height to depth
+h(:)=h(:)+initial_sensor_height ; 
+
+load('/media/taran/DATADRIVE2/Obs_data/matfiles/pspec_uhat_tr.mat','uhat_wh','Tr_wh')
 uhat_emp=uhat_wh;
 Tbr=Tr_wh; 
 
@@ -28,11 +32,11 @@ end
 %  end
 % % 
 Uw_emp=uhat_emp; 
-% 
-save('/media/taran/DATADRIVE2/Obs_data/matfiles/workhorse_emp_waveform_ubspecdat_vspec.mat',.....
-     'Ur_emp','Hs','Tbr','h',.......
+% % 
+ save('/media/taran/DATADRIVE2/Obs_data/matfiles/workhorse_emp_waveform_ubspecdat_pspec.mat',.....
+      'Ur_emp','Hs','Tbr','h',.......
       'umax_emp','umin_emp','Tc_emp','Tt_emp',........
-      'Tcu_emp','Ttu_emp','RR_emp','beta_emp','uhat_emp'); 
+       'Tcu_emp','Ttu_emp','RR_emp','beta_emp','uhat_emp'); 
  
  %
  function [r, phi, Ur] = skewness_params(H_s, T, depth);

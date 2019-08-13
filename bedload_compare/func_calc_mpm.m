@@ -23,6 +23,6 @@ for t=1:burst_time
    cff1(t)=cff1(t)*sign(theta(t));
 % %   
  %  qb_measured=gamma*cff1(t)*sqrt(smgd3)+qb_measured; 
-qb_measured=gamma*cff1(t)*sqrt(smgd3)+qb_measured; 
+   qb_measured=gamma*cff1(t)*sqrt(smgd3)+qb_measured; 
 end
 qb_measured=qb_measured/8400; 
